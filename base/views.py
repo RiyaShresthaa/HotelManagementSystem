@@ -22,18 +22,32 @@ def roomTypeView(request):
             return Response(serializer.errors)
 
 
-@api_view(['GET','PUT'])
+@api_view(['GET','PUT','DELETE'])
 def roomTypeDetailView(request,pk):
     if request.method == 'GET':
-        room_type_obj = RoomType.objects.get(id=pk)
+        try:
+            room_type_obj = RoomType.objects.get(id=pk)
+        except:
+            return Response('Data not Found!')
         serializer = RoomTypeSerializer(room_type_obj)
         return Response(serializer.data)
     elif request.method == 'PUT':
-        room_type_obj = RoomType.objects.get(id=pk)
+        try:
+            room_type_obj = RoomType.objects.get(id=pk)
+        except:
+            return Response('Data not Found!')
         serializer = RoomTypeSerializer(room_type_obj,data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
-    
+    elif request.method == 'DELETE':
+        try:
+            room_type_obj = RoomType.objects.get(id=pk)
+        except:
+            return Response('Data not Found!')
+        room_type_obj.delete()
+        return Response('Data Deleted!')
+        
+
