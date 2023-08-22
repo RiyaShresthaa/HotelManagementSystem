@@ -16,9 +16,9 @@ class BillSerializer(serializers.ModelSerializer):
         model = Bill
         fields = "__all__"
 
-class PaymentSerializer(serializers.ModelSerializer):
+class PaymentInfoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Payment
+        model = PaymentInfo
         fields = "__all__"
 
 class EmployeeInfoSerializer(serializers.ModelSerializer):
@@ -39,4 +39,9 @@ class FoodSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
+        fields = "__all__"
+
+class FacilitiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Facilities
         fields = "__all__"

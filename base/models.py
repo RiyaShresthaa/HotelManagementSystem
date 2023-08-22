@@ -41,7 +41,7 @@ class CustomerDetail(models.Model):
 
 class Bill(models.Model):
     title = models.CharField(max_length=300)
-    description = models.textField()
+    description = models.TextField()
     amount = models.IntegerField()
     status = models.CharField(max_length=200,choices=bill_status_list)
     date = models.DateField()
