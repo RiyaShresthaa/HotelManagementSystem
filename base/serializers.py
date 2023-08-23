@@ -8,6 +8,11 @@ class RoomTypeSerializer(serializers.ModelSerializer):#inherite modelserializer 
 
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
+        model = Room
+        fields = "__all__"
+
+class CustomerDetailSerializer(serializers.ModelSerializer):
+    class Meta:
         model = CustomerDetail
         fields = "__all__"
 
