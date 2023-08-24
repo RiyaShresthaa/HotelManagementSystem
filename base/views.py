@@ -1,13 +1,30 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializers import *
 from .models import *
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
 
 # Create your views here.
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
+    if request.method == 'POST':
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(username=email,password=password)
+        if user != None:
+            token,_ = Token.objects.get_or_create(user=user)
+            return Response({'token':token.key})
+
+
 @api_view(['GET','POST'])
 def roomTypeView(request):
     if request.method == 'GET':
@@ -75,6 +92,8 @@ class RoomApiView(GenericAPIView):#genericapiview every http method function is 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['room_type','status']
     serializer_class = RoomSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self,request):
         room_objects = Room.objects.all()
