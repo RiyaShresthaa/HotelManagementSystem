@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from .models import *
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+
 class RoomTypeSerializer(serializers.ModelSerializer):#inherite modelserializer from serializer 
     class Meta:#meta class defined can extra features of class
         model = RoomType

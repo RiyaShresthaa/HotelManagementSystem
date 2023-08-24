@@ -10,19 +10,22 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
+from .permissions import FrontDeskUserPermission
+from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
-    if request.method == 'POST':
-        email = request.data.get('email')
-        password = request.data.get('password')
-        user = authenticate(username=email,password=password)
-        if user != None:
-            token,_ = Token.objects.get_or_create(user=user)
-            return Response({'token':token.key})
+    email = request.data.get('email')
+    password = request.data.get('password')
+    user = authenticate(username=email,password=password)
+    if user != None:
+        token,_ = Token.objects.get_or_create(user=user)
+        return Response({'token':token.key})
+    else: 
+        return Response(user)
 
 
 @api_view(['GET','POST'])
@@ -93,7 +96,7 @@ class RoomApiView(GenericAPIView):#genericapiview every http method function is 
     filterset_fields = ['room_type','status']
     serializer_class = RoomSerializer
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, FrontDeskUserPermission]
 
     def get(self,request):
         room_objects = Room.objects.all()
@@ -108,3 +111,19 @@ class RoomApiView(GenericAPIView):#genericapiview every http method function is 
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+
+@api_view(['POST'])
+def register(request):
+    if request.method == 'POST':
+        request.data['username'] = 'user'
+        password = request.data.get("password")
+        hash_password = make_password(password)
+        request.data['password'] = hash_password
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('User created!')
+        else:
+            return Response(serializer.errors)
+    
