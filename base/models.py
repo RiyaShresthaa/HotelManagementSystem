@@ -21,6 +21,8 @@ class User(AbstractUser):#inherite abstract user in User class
 
 class RoomType(models.Model):
     name = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
 
 class Room(models.Model):
     name = models.CharField(max_length=200)
@@ -28,6 +30,8 @@ class Room(models.Model):
     bed_count = models.IntegerField()
     status = models.CharField(max_length=20, choices=room_status_list)
     room_type = models.ForeignKey(RoomType,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
 
 class CustomerDetail(models.Model):
     name = models.CharField(max_length=200)
@@ -38,6 +42,8 @@ class CustomerDetail(models.Model):
     phone = models.IntegerField()
     email = models.EmailField(unique=True)
     room = models.ForeignKey(Room,on_delete=models.SET_NULL,null=True)
+    def __str__(self):
+        return self.name
 
 class Bill(models.Model):
     title = models.CharField(max_length=300)
@@ -46,11 +52,15 @@ class Bill(models.Model):
     status = models.CharField(max_length=200,choices=bill_status_list)
     date = models.DateField()
     customer_detail = models.ForeignKey(CustomerDetail,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.title
 
 class PaymentInfo(models.Model):
     bill = models.ForeignKey(Bill,on_delete=models.CASCADE)
     paid_amount = models.IntegerField()
     payment_method = models.CharField(max_length=100, choices=payment_method_list)
+    def __str__(self):
+        return self.bill
 
 class EmployeeInfo(models.Model):
     name = models.CharField(max_length=200)
@@ -60,9 +70,13 @@ class EmployeeInfo(models.Model):
     joining_date = models.DateField()
     salary= models.IntegerField()
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
 
 class MenuType(models.Model):
     name = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
 
 class Food(models.Model):
     name = models.CharField(max_length=200)
@@ -70,10 +84,14 @@ class Food(models.Model):
     food_type = models.CharField(max_length=200,choices=food_type_list)
     price = models.IntegerField()
     menu_type= models.ForeignKey(MenuType,on_delete=models.SET_NULL,null=True)
+    def __str__(self):
+        return self.name
 
 class Service(models.Model):
     name = models.CharField(max_length=300)
     description = models.TextField()
+    def __str__(self):
+        return self.name
 
 class Facilities(Service):
     pass
