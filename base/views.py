@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
-from .permissions import FrontDeskUserPermission
+from .permissions import *
 from django.contrib.auth.hashers import make_password
 
 # Create your views here.
@@ -109,12 +109,12 @@ def roomView(request,pk):
 #every method is related
 #callable
 #generic Api View helps customize
-class RoomApiView(GenericAPIView):#genericapiview every http method function is made
+class RoomAPIView(GenericAPIView):#genericapiview every http method function is made
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['room_type','status']
     serializer_class = RoomSerializer
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, FrontDeskUserPermission]
+    permission_classes = [IsAuthenticated, FrontDeskUserPermission, ManagementUserPermission]
 
     def get(self,request):
         room_objects = Room.objects.all()
@@ -173,6 +173,27 @@ def CustomerDetailView(request,pk):
             return Response('Data not Found!')
         customer_details_obj.delete()
         return Response('Data Deleted!')   
+    
+class CustomerAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name','age']
+    serializer_class = CustomerDetailSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, FrontDeskUserPermission, ManagementUserPermission]
+
+    def get(self,request):
+        customer_objects = CustomerDetail.objects.all()
+        filter_objects = self.filter_queryset(customer_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
 #----------------------------Bill------------------------------------
 @api_view(['GET','POST'])
@@ -217,6 +238,27 @@ def BillDetailView(request,pk):
             return Response('Data not Found!')
         bill_detail_obj.delete()
         return Response('Data Deleted!')   
+    
+class BillAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title','status','date']
+    serializer_class = BillSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, FrontDeskUserPermission, AccountingUserPermission, ManagementUserPermission]
+
+    def get(self,request):
+        bill_objects = Bill.objects.all()
+        filter_objects = self.filter_queryset(bill_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
 #----------------------------PaymentInfo------------------------------------
 @api_view(['GET','POST'])
@@ -260,7 +302,28 @@ def PaymentInfoDetailView(request,pk):
         except:
             return Response('Data not Found!')
         payment_detail_obj.delete()
-        return Response('Data Deleted!')  
+        return Response('Data Deleted!')
+
+class PaymentAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['payment_method']
+    serializer_class = PaymentInfoSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, FrontDeskUserPermission, AccountingUserPermission, ManagementUserPermission]
+
+    def get(self,request):
+        payment_objects = PaymentInfo.objects.all()
+        filter_objects = self.filter_queryset(payment_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)  
     
 
 #----------------------------EmployeeInfo------------------------------------
@@ -307,7 +370,26 @@ def EmployeeInfoDetailView(request,pk):
         employee_detail_obj.delete()
         return Response('Data Deleted!')  
     
+class EmployeeAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name','joining_date','salary']
+    serializer_class = EmployeeInfoSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ManagementUserPermission]
 
+    def get(self,request):
+        employee_objects = EmployeeInfo.objects.all()
+        filter_objects = self.filter_queryset(employee_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 #----------------------------MenuType------------------------------------
 @api_view(['GET','POST'])
 def MenuTypeView(request):
@@ -351,7 +433,27 @@ def MenuTypeDetailView(request,pk):
             return Response('Data not Found!')
         menuType_detail_obj.delete()
         return Response('Data Deleted!')  
+
+class MenuTypeAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
+    serializer_class = MenuTypeSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, RestaurantUserPermission, ManagementUserPermission]
+
+    def get(self,request):
+        menuType_objects = MenuType.objects.all()
+        filter_objects = self.filter_queryset(menuType_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
     
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)   
 
 #----------------------------Food------------------------------------
 @api_view(['GET','POST'])
@@ -396,7 +498,27 @@ def FoodDetailView(request,pk):
             return Response('Data not Found!')
         food_detail_obj.delete()
         return Response('Data Deleted!')  
+
+class FoodAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name','ingredients', 'food_type']
+    serializer_class = FoodSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, RestaurantUserPermission, ManagementUserPermission]
+
+    def get(self,request):
+        food_objects = Food.objects.all()
+        filter_objects = self.filter_queryset(food_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
     
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)   
 
 #----------------------------Service------------------------------------
 @api_view(['GET','POST'])
@@ -425,7 +547,7 @@ def ServiceDetailView(request,pk):
         return Response(serializer.data)
     elif request.method == 'PUT':
         try:
-            bill_detail_obj = Service.objects.get(id=pk)
+            service_detail_obj = Service.objects.get(id=pk)
         except:
             return Response('Data not Found!')
         serializer = ServiceSerializer(service_detail_obj,data=request.data)
@@ -441,7 +563,27 @@ def ServiceDetailView(request,pk):
             return Response('Data not Found!')
         service_detail_obj.delete()
         return Response('Data Deleted!')  
+
+class ServiceAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
+    serializer_class = ServiceSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ManagementUserPermission]
+
+    def get(self,request):
+        service_objects = Service.objects.all()
+        filter_objects = self.filter_queryset(service_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
     
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)   
 
 #----------------------------Facilities------------------------------------
 @api_view(['GET','POST'])
@@ -486,6 +628,27 @@ def FacilitiesDetailView(request,pk):
             return Response('Data not Found!')
         facilities_detail_obj.delete()
         return Response('Data Deleted!')  
+    
+class FacilitiesAPIView(GenericAPIView):#genericapiview every http method function is made
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
+    serializer_class = FacilitiesSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ManagementUserPermission]
+
+    def get(self,request):
+        facilities_objects = Facilities.objects.all()
+        filter_objects = self.filter_queryset(facilities_objects)
+        serializer = self.serializer_class(filter_objects,many=True)#many=True works like for loop
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
 
 
